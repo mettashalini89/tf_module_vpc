@@ -32,7 +32,7 @@ resource "aws_route_table" "public_route_table" {
 
 resource "aws_route_table_association" "public_association" {
   for_each = var.public_subnets
-  subnet_id = lookup(lookup(aws_subnet.public_subnets, each.value["name"], null ), id, null)
+  subnet_id = lookup(lookup(aws_subnet.public_subnets, each.value["name"], null ), "id", null)
   route_table_id = aws_route_table.public_route_table[each.value["name"]].id
 }
 
@@ -62,6 +62,6 @@ resource "aws_route_table" "private_route_table" {
 
 resource "aws_route_table_association" "private_association" {
   for_each = var.private_subnets
-  subnet_id = lookup(lookup(aws_subnet.private_subnets, each.value["name"], null ), id, null)
+  subnet_id = lookup(lookup(aws_subnet.private_subnets, each.value["name"], null ), "id", null)
   route_table_id = aws_route_table.private_route_table[each.value["name"]].id
 }
