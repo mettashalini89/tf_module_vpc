@@ -31,7 +31,7 @@ resource "aws_internet_gateway" "igw" {
 
 # Create elastic ips for nat gateways
 resource "aws_eip" "nat" {
-  instance = var.public_subnets
+  for_each = var.public_subnets
   vpc      = true
 }
 #Creating nat gateways for each public subnets
