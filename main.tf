@@ -29,6 +29,24 @@ resource "aws_internet_gateway" "igw" {
   )
 }
 
+# Create elastic ips for nat gateways
+resource "aws_eip" "nat" {
+  instance = var.public_subnets
+  vpc      = true
+}
+#Creating nat gateways for each public subnets
+resource "aws_nat_gateway" "nat_gateway" {
+  for_each = var.public_subnets
+  allocation_id = aws_eip.nat[each.value["name"]].id
+  subnet_id     = aws_subnet.public_subnets[each.value["name"]].id
+
+  tags = merge(
+    var.tags,
+    {Name = "${var.env}-${each.value["name"]}"}
+  )
+
+}
+
 ## Public route table
 resource "aws_route_table" "public_route_table" {
   vpc_id = aws_vpc.vpc.id
