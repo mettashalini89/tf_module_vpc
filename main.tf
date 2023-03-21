@@ -6,6 +6,14 @@ resource "aws_vpc" "vpc" {
   )
 }
 
+## Peering connection
+resource "aws_vpc_peering_connection" "peer" {
+  peer_owner_id = data.aws_caller_identity.account.account_id
+  peer_vpc_id   = var.default_vpc_id
+  vpc_id        = aws_vpc.vpc.id
+  auto_accept   = true
+}
+
 ## Public subnets
 resource "aws_subnet" "public_subnets" {
   vpc_id = aws_vpc.vpc.id
