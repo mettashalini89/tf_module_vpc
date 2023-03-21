@@ -124,3 +124,11 @@ resource "aws_route_table_association" "private_association" {
   subnet_id = lookup(lookup(aws_subnet.private_subnets, each.value["name"], null ), "id", null)
   route_table_id = aws_route_table.private_route_table[each.value["name"]].id
 }
+
+### route to default vpc for peering connection to work
+
+resource "aws_route" "route" {
+  route_table_id            = var.default_vpc_route_table
+  destination_cidr_block    = var.vpc_cidr
+  vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
+}
