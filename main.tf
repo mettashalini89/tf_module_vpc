@@ -82,13 +82,17 @@ resource "aws_subnet" "private_subnets" {
 
 }
 
+locals {
+  az = split("-", "web-az1")[1]
+}
+
 ####private route table
 resource "aws_route_table" "private_route_table" {
   vpc_id = aws_vpc.vpc.id
   for_each = var.private_subnets
   route {
     cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat_gateway[each.value["availability_zone"]].id
+    nat_gateway_id = aws_nat_gateway.nat_gateway["public-${split(each.value["name"])[1]}"].id
   }
 
   tags = merge(
