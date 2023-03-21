@@ -88,7 +88,7 @@ resource "aws_route_table" "private_route_table" {
   for_each = var.private_subnets
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.nat_gateway[each.value["availability_zone"]].id
+    nat_gateway_id = aws_nat_gateway.nat_gateway[each.value["availability_zone"]].id
   }
 
   tags = merge(
