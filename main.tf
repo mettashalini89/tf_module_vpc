@@ -1,4 +1,4 @@
-resource "aws_vpc" "vpc" {
+resource "aws_vpc" "main" {
   cidr_block = var.vpc_cidr
   tags = merge(
     var.tags,
@@ -10,7 +10,7 @@ resource "aws_vpc" "vpc" {
 resource "aws_vpc_peering_connection" "peer" {
   peer_owner_id = data.aws_caller_identity.account.account_id
   peer_vpc_id   = var.default_vpc_id
-  vpc_id        = aws_vpc.vpc.id
+  vpc_id        = aws_vpc.main.id
   auto_accept   = true
   tags = merge(
     var.tags,
@@ -20,7 +20,7 @@ resource "aws_vpc_peering_connection" "peer" {
 
 ## Public subnets
 resource "aws_subnet" "public_subnets" {
-  vpc_id = aws_vpc.vpc.id
+  vpc_id = aws_vpc.main.id
   tags = merge(
     var.tags,
     {Name = "${var.env}-${each.value["name"]}"}
@@ -33,7 +33,7 @@ resource "aws_subnet" "public_subnets" {
 
 # Need one internet gatway for public subnets to route
 resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.vpc.id
+  vpc_id = aws_vpc.main.id
 
   tags = merge(
     var.tags,
@@ -61,7 +61,7 @@ resource "aws_nat_gateway" "nat_gateway" {
 
 ## Public route table
 resource "aws_route_table" "public_route_table" {
-  vpc_id = aws_vpc.vpc.id
+  vpc_id = aws_vpc.main.id
 
   route {
     cidr_block = "0.0.0.0/0"
@@ -88,7 +88,7 @@ resource "aws_route_table_association" "public_association" {
 
 ####private subnets
 resource "aws_subnet" "private_subnets" {
-  vpc_id = aws_vpc.vpc.id
+  vpc_id = aws_vpc.main.id
   tags = merge(
     var.tags,
     {Name = "${var.env}-${each.value["name"]}"}
@@ -101,7 +101,7 @@ resource "aws_subnet" "private_subnets" {
 
 ####private route table
 resource "aws_route_table" "private_route_table" {
-  vpc_id = aws_vpc.vpc.id
+  vpc_id = aws_vpc.main.id
   for_each = var.private_subnets
   route {
     cidr_block = "0.0.0.0/0"
